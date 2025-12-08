@@ -19,6 +19,9 @@ RUN install -m 0755 -d /etc/apt/keyrings \
     && groupadd -g ${DOCKER_GID:-999} docker \
     && usermod -aG docker node
 
+# Install copilot CLI as root before switching to node user
+RUN npm install -g @github/copilot
+
 # Set up runtime directories
 RUN mkdir -p /workspace /qwen_data \
     && chown -R node:node /workspace /qwen_data
@@ -26,9 +29,6 @@ RUN mkdir -p /workspace /qwen_data \
 USER node
 
 WORKDIR /workspace
-
-# Install copilot CLI
-RUN npm install -g @github/copilot
 
 COPY --chown=node:node entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
