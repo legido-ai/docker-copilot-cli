@@ -1,34 +1,29 @@
-#networks:
-#  network-ollama:
-#    external: true
-
 services:
-  qwen-code:
+  copilot-cli:
     build:
       args:
         # Output of command: getent group docker | cut -d: -f3
         DOCKER_GID: ${DOCKER_GID:-998}
       context: .
-    container_name: ${CONTAINER_NAME:-qwen-code}
+    container_name: ${CONTAINER_NAME:-copilot-cli}
     environment:
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
-#      - OLLAMA_HOST=${OLLAMA_HOST}
-#      - OLLAMA_MODEL=${OLLAMA_MODEL}
-      - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}
-      - TZ=${TZ:-UTC}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      GITHUB_APP_ID: ${GITHUB_APP_ID}
+      GITHUB_INSTALLATION_ID: ${GITHUB_INSTALLATION_ID}
+      GITHUB_PRIVATE_KEY: ${GITHUB_PRIVATE_KEY}
+      PHOENIX_API_KEY: ${PHOENIX_API_KEY}
+      PHOENIX_ENDPOINT: ${PHOENIX_ENDPOINT}
+      SSH_PRIVATE_KEY: ${SSH_PRIVATE_KEY}
+      TZ: ${TZ:-UTC}
     healthcheck:
       test: ["CMD", "node", "--version"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
-    hostname: qwen-code
-#    networks:
-#      - network-ollama
     volumes:
-      - ${VOLUME_PROJECTS:-./projects}:/projects
-      - ${VOLUME_CONFIG:-./config}:/home/node/.qwen
+      - ${VOLUME_WORKSPACE:-./workspace}:/workspace
+      - ${VOLUME_CONFIG:-./config}:/home/node
       - /var/run/docker.sock:/var/run/docker.sock
