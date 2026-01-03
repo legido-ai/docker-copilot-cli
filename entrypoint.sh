@@ -135,7 +135,7 @@ EOF
 # Process environment variables once at boot time
 process_env_vars "$CONFIG_FILE"
 
-# Configure auto-approval for git clone operations
+# Configure auto-approval for all commands (YOLO mode)
 configure_copilot_auto_approval
 
 # Process environment variables or configuration files with jq at startup
