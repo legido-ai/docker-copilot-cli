@@ -30,3 +30,7 @@ docker run -it --rm \
   --name copilot-cli \
   ghcr.io/legido-ai-workspace/copilot-cli:latest
 ```
+
+## 📝 Copilot Instructions
+
+Custom Copilot instructions can be added to enhance the AI's behavior. Place your instructions in `/workspace/.github/copilot-instructions.md`.
