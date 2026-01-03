@@ -33,4 +33,4 @@ docker run -it --rm \
 
 ## 📝 Copilot Instructions
 
-Custom Copilot instructions can be added to enhance the AI's behavior. Place your instructions in `/workspace/.github/copilot-instructions.md`.
+Custom Copilot instructions can be added to enhance the AI's behavior. For more information, see the [official documentation](https://copilot-instructions.md). Place your instructions in `/workspace/.github/copilot-instructions.md`.
