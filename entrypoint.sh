@@ -2,6 +2,7 @@
 set -e
 
 CONFIG_FILE="/home/node/.copilot/mcp-config.json"
+COPILOT_SETTINGS_FILE="/home/node/.copilot/settings.json"
 
 # Function to escape value for JSON and sed replacement
 escape_for_json_and_sed() {
@@ -79,8 +80,64 @@ process_env_vars() {
     echo "[ENV-EXPAND] Environment variable expansion completed successfully"
 }
 
+# Function to configure auto-approval for git clone operations
+configure_copilot_auto_approval() {
+    local auto_approve="${COPILOT_AUTO_APPROVE_GIT_CLONE:-false}"
+    
+    # Normalize the value to lowercase for comparison
+    auto_approve=$(echo "$auto_approve" | tr '[:upper:]' '[:lower:]')
+    
+    # Validate the value
+    if [ "$auto_approve" != "true" ] && [ "$auto_approve" != "false" ]; then
+        echo "[AUTO-APPROVE] Warning: Invalid value for COPILOT_AUTO_APPROVE_GIT_CLONE: '$COPILOT_AUTO_APPROVE_GIT_CLONE'"
+        echo "[AUTO-APPROVE] Expected 'true' or 'false', defaulting to 'false'"
+        auto_approve="false"
+    fi
+    
+    if [ "$auto_approve" = "true" ]; then
+        echo "[AUTO-APPROVE] Configuring git clone auto-approval..."
+        
+        # Create .copilot directory if it doesn't exist
+        mkdir -p /home/node/.copilot
+        
+        # Create or update the Copilot settings file with auto-approval configuration
+        # This configuration allows git clone commands to run without interactive prompts
+        cat > "$COPILOT_SETTINGS_FILE" <<'EOF'
+{
+  "terminal": {
+    "autoApprove": {
+      "enabled": true,
+      "allowlist": [
+        "^git\\s+clone(\\s+.*)?$"
+      ]
+    }
+  }
+}
+EOF
+        
+        if [ $? -eq 0 ]; then
+            echo "[AUTO-APPROVE] Git clone auto-approval enabled successfully"
+            echo "[AUTO-APPROVE] All 'git clone' operations will proceed without interactive prompts"
+        else
+            echo "[AUTO-APPROVE] Error: Failed to create auto-approval configuration"
+            return 1
+        fi
+    else
+        echo "[AUTO-APPROVE] Git clone auto-approval is disabled (default behavior)"
+        
+        # Remove the auto-approval settings file if it exists
+        if [ -f "$COPILOT_SETTINGS_FILE" ]; then
+            rm -f "$COPILOT_SETTINGS_FILE"
+            echo "[AUTO-APPROVE] Removed existing auto-approval configuration"
+        fi
+    fi
+}
+
 # Process environment variables once at boot time
 process_env_vars "$CONFIG_FILE"
+
+# Configure auto-approval for git clone operations
+configure_copilot_auto_approval
 
 # Process environment variables or configuration files with jq at startup
 # For example, if there are JSON configuration files, we could validate or process them
