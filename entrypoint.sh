@@ -110,12 +110,12 @@ configure_copilot_auto_approval() {
 }
 EOF
         
-        if [ $? -eq 0 ]; then
+        # Verify the file was created successfully
+        if [ -f "$COPILOT_CONFIG_FILE" ]; then
             echo "[AUTO-APPROVE] Git clone auto-approval enabled successfully"
             echo "[AUTO-APPROVE] All 'git clone' operations will proceed without interactive prompts"
         else
             echo "[AUTO-APPROVE] Error: Failed to create auto-approval configuration"
-            return 1
         fi
     else
         echo "[AUTO-APPROVE] Git clone auto-approval is disabled (default behavior)"
