@@ -84,12 +84,12 @@ process_env_vars() {
 configure_copilot_auto_approval() {
     local auto_approve="${COPILOT_AUTO_APPROVE_GIT_CLONE:-false}"
     
-    # Normalize the value to lowercase for comparison
-    auto_approve=$(echo "$auto_approve" | tr '[:upper:]' '[:lower:]')
+    # Normalize the value to lowercase for comparison (using bash parameter expansion)
+    auto_approve="${auto_approve,,}"
     
     # Validate the value
     if [ "$auto_approve" != "true" ] && [ "$auto_approve" != "false" ]; then
-        echo "[AUTO-APPROVE] Warning: Invalid value for COPILOT_AUTO_APPROVE_GIT_CLONE: '$COPILOT_AUTO_APPROVE_GIT_CLONE'"
+        echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE_GIT_CLONE' (normalized: '$auto_approve')"
         echo "[AUTO-APPROVE] Expected 'true' or 'false', defaulting to 'false'"
         auto_approve="false"
     fi
@@ -110,12 +110,17 @@ configure_copilot_auto_approval() {
 }
 EOF
         
-        # Verify the file was created successfully
+        # Verify the file was created successfully and validate JSON
         if [ -f "$COPILOT_CONFIG_FILE" ]; then
-            echo "[AUTO-APPROVE] Git clone auto-approval enabled successfully"
-            echo "[AUTO-APPROVE] All 'git clone' operations will proceed without interactive prompts"
+            # Validate JSON syntax with jq
+            if jq empty "$COPILOT_CONFIG_FILE" 2>/dev/null; then
+                echo "[AUTO-APPROVE] Git clone auto-approval enabled successfully"
+                echo "[AUTO-APPROVE] All 'git clone' operations will proceed without interactive prompts"
+            else
+                echo "[AUTO-APPROVE] Error: Generated configuration file has invalid JSON syntax"
+            fi
         else
-            echo "[AUTO-APPROVE] Error: Failed to create auto-approval configuration"
+            echo "[AUTO-APPROVE] Error: Failed to create auto-approval configuration file"
         fi
     else
         echo "[AUTO-APPROVE] Git clone auto-approval is disabled (default behavior)"
