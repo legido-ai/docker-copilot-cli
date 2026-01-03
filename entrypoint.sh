@@ -2,7 +2,7 @@
 set -e
 
 CONFIG_FILE="/home/node/.copilot/mcp-config.json"
-COPILOT_SETTINGS_FILE="/home/node/.copilot/settings.json"
+COPILOT_CONFIG_FILE="/home/node/.copilot/config.json"
 
 # Function to escape value for JSON and sed replacement
 escape_for_json_and_sed() {
@@ -100,17 +100,12 @@ configure_copilot_auto_approval() {
         # Create .copilot directory if it doesn't exist
         mkdir -p /home/node/.copilot
         
-        # Create or update the Copilot settings file with auto-approval configuration
+        # Create or update the Copilot config file with auto-approval configuration
         # This configuration allows git clone commands to run without interactive prompts
-        cat > "$COPILOT_SETTINGS_FILE" <<'EOF'
+        cat > "$COPILOT_CONFIG_FILE" <<'EOF'
 {
-  "terminal": {
-    "autoApprove": {
-      "enabled": true,
-      "allowlist": [
-        "^git\\s+clone(\\s+.*)?$"
-      ]
-    }
+  "chat.tools.terminal.autoApprove": {
+    "/^git\\s+clone(\\s+.*)?$/": true
   }
 }
 EOF
@@ -125,9 +120,9 @@ EOF
     else
         echo "[AUTO-APPROVE] Git clone auto-approval is disabled (default behavior)"
         
-        # Remove the auto-approval settings file if it exists
-        if [ -f "$COPILOT_SETTINGS_FILE" ]; then
-            rm -f "$COPILOT_SETTINGS_FILE"
+        # Remove the auto-approval config file if it exists
+        if [ -f "$COPILOT_CONFIG_FILE" ]; then
+            rm -f "$COPILOT_CONFIG_FILE"
             echo "[AUTO-APPROVE] Removed existing auto-approval configuration"
         fi
     fi
