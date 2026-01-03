@@ -80,33 +80,32 @@ process_env_vars() {
     echo "[ENV-EXPAND] Environment variable expansion completed successfully"
 }
 
-# Function to configure auto-approval for git clone operations
+# Function to configure auto-approval for all commands (YOLO mode)
 configure_copilot_auto_approval() {
-    local auto_approve="${COPILOT_AUTO_APPROVE_GIT_CLONE:-false}"
+    local auto_approve="${COPILOT_AUTO_APPROVE_COMMANDS:-false}"
     
     # Normalize the value to lowercase for comparison (using bash parameter expansion)
     auto_approve="${auto_approve,,}"
     
     # Validate the value
     if [ "$auto_approve" != "true" ] && [ "$auto_approve" != "false" ]; then
-        echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE_GIT_CLONE' (normalized: '$auto_approve')"
+        echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE_COMMANDS' (normalized: '$auto_approve')"
         echo "[AUTO-APPROVE] Expected 'true' or 'false', defaulting to 'false'"
         auto_approve="false"
     fi
     
     if [ "$auto_approve" = "true" ]; then
-        echo "[AUTO-APPROVE] Configuring git clone auto-approval..."
+        echo "[AUTO-APPROVE] Configuring YOLO mode (auto-approve ALL commands)..."
+        echo "[AUTO-APPROVE] WARNING: All commands will execute without approval prompts"
         
         # Create .copilot directory if it doesn't exist
         mkdir -p /home/node/.copilot
         
         # Create or update the Copilot config file with auto-approval configuration
-        # This configuration allows git clone commands to run without interactive prompts
+        # This configuration allows ALL commands to run without interactive prompts
         cat > "$COPILOT_CONFIG_FILE" <<'EOF'
 {
-  "chat.tools.terminal.autoApprove": {
-    "/^git\\s+clone(\\s+.*)?$/": true
-  }
+  "chat.tools.terminal.autoApprove": true
 }
 EOF
         
@@ -114,8 +113,8 @@ EOF
         if [ -f "$COPILOT_CONFIG_FILE" ]; then
             # Validate JSON syntax with jq
             if jq empty "$COPILOT_CONFIG_FILE" 2>/dev/null; then
-                echo "[AUTO-APPROVE] Git clone auto-approval enabled successfully"
-                echo "[AUTO-APPROVE] All 'git clone' operations will proceed without interactive prompts"
+                echo "[AUTO-APPROVE] YOLO mode enabled successfully"
+                echo "[AUTO-APPROVE] ALL commands will proceed without interactive prompts"
             else
                 echo "[AUTO-APPROVE] Error: Generated configuration file has invalid JSON syntax"
             fi
@@ -123,7 +122,7 @@ EOF
             echo "[AUTO-APPROVE] Error: Failed to create auto-approval configuration file"
         fi
     else
-        echo "[AUTO-APPROVE] Git clone auto-approval is disabled (default behavior)"
+        echo "[AUTO-APPROVE] YOLO mode is disabled (default behavior)"
         
         # Remove the auto-approval config file if it exists
         if [ -f "$COPILOT_CONFIG_FILE" ]; then
