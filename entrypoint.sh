@@ -112,5 +112,5 @@ if [ ! -z "$JSON_CONFIG" ]; then
   fi
 fi
 
-# Execute the container's original command (starts Qwen Code)
+# Execute the container's original command
 exec "$@"
