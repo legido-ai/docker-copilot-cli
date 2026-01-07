@@ -1,7 +1,17 @@
 #!/bin/bash
 set -e
 
+# This script runs as root initially to fix permissions,
+# then switches to the node user for the actual command
+
 CONFIG_FILE="/home/node/.copilot/mcp-config.json"
+
+# Ensure .copilot directory exists and is owned by node user
+# This handles the case where /home/node is mounted from the host
+if [ ! -d /home/node/.copilot ]; then
+    mkdir -p /home/node/.copilot
+fi
+chown -R node:node /home/node/.copilot 2>/dev/null || true
 
 # Function to configure auto-approval for Copilot CLI operations
 configure_copilot_auto_approval() {
@@ -149,5 +159,5 @@ if [ ! -z "$JSON_CONFIG" ]; then
   fi
 fi
 
-# Execute the container's original command
-exec "$@"
+# Switch to node user and execute the container's command
+exec runuser -u node -- "$@"

@@ -26,11 +26,10 @@ RUN npm install -g @github/copilot
 RUN mkdir -p /workspace \
     && chown -R node:node /workspace
 
-USER node
-
 WORKDIR /workspace
 
-COPY --chown=node:node entrypoint.sh /usr/local/bin/entrypoint.sh
+# Copy entrypoint script (will run as root initially to fix permissions)
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
