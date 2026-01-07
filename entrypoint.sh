@@ -1,7 +1,60 @@
 #!/bin/bash
 set -e
 
+# This script runs as root initially to fix permissions,
+# then switches to the node user for the actual command
+
 CONFIG_FILE="/home/node/.copilot/mcp-config.json"
+
+# Ensure /home/node/.copilot directory exists
+# When /home/node is volume-mounted, this creates the directory if missing
+# but doesn't interfere with existing mounted content
+echo "[INIT] Checking /home/node directory structure..."
+
+if [ ! -d /home/node/.copilot ]; then
+    echo "[INIT] Creating /home/node/.copilot directory"
+    mkdir -p /home/node/.copilot
+    chown node:node /home/node/.copilot
+else
+    echo "[INIT] /home/node/.copilot already exists"
+    ls -la /home/node/.copilot/ | head -5
+fi
+
+echo "[INIT] Directory setup complete"
+
+# Function to configure auto-approval for Copilot CLI operations
+configure_copilot_auto_approval() {
+    echo "[AUTO-APPROVE] Checking auto-approval configuration..."
+
+    # Check if COPILOT_AUTO_APPROVE is set
+    if [ -z "${COPILOT_AUTO_APPROVE+x}" ]; then
+        echo "[AUTO-APPROVE] COPILOT_AUTO_APPROVE not set, auto-approval disabled (default behavior)"
+        return 0
+    fi
+
+    # Normalize value to lowercase
+    local value=$(echo "$COPILOT_AUTO_APPROVE" | tr '[:upper:]' '[:lower:]')
+
+    case "$value" in
+        true|1|yes|on)
+            echo "[AUTO-APPROVE] Configuring auto-approval for all operations..."
+            # Set COPILOT_ALLOW_ALL which enables all tools without confirmation
+            # This is the native Copilot CLI environment variable for this purpose
+            export COPILOT_ALLOW_ALL=true
+            echo "[AUTO-APPROVE] Auto-approval enabled successfully"
+            echo "[AUTO-APPROVE] All tool operations will proceed without interactive prompts"
+            echo "[AUTO-APPROVE] Copilot CLI is now fully autonomous"
+            ;;
+        false|0|no|off)
+            echo "[AUTO-APPROVE] Auto-approval explicitly disabled"
+            ;;
+        *)
+            echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE' for COPILOT_AUTO_APPROVE"
+            echo "[AUTO-APPROVE] Valid values are: true, false, 1, 0, yes, no, on, off"
+            echo "[AUTO-APPROVE] Defaulting to disabled (safe behavior)"
+            ;;
+    esac
+}
 
 # Function to escape value for JSON and sed replacement
 escape_for_json_and_sed() {
@@ -82,6 +135,9 @@ process_env_vars() {
 # Process environment variables once at boot time
 process_env_vars "$CONFIG_FILE"
 
+# Configure auto-approval for Copilot CLI operations
+configure_copilot_auto_approval
+
 # Process environment variables or configuration files with jq at startup
 # For example, if there are JSON configuration files, we could validate or process them
 
@@ -112,5 +168,5 @@ if [ ! -z "$JSON_CONFIG" ]; then
   fi
 fi
 
-# Execute the container's original command
-exec "$@"
+# Switch to node user and execute the container's command
+exec runuser -u node -- "$@"

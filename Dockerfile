@@ -22,15 +22,16 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 # Install copilot CLI as root before switching to node user
 RUN npm install -g @github/copilot
 
-# Set up runtime directories
+# Set up runtime directories and ensure /home/node is owned by node user
 RUN mkdir -p /workspace \
-    && chown -R node:node /workspace
-
-USER node
+    && chown -R node:node /workspace \
+    && mkdir -p /home/node \
+    && chown -R node:node /home/node
 
 WORKDIR /workspace
 
-COPY --chown=node:node entrypoint.sh /usr/local/bin/entrypoint.sh
+# Copy entrypoint script (will run as root initially to fix permissions)
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
