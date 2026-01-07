@@ -3,47 +3,6 @@ set -e
 
 CONFIG_FILE="/home/node/.copilot/mcp-config.json"
 
-# Function to configure auto-approval for Copilot CLI operations
-configure_copilot_auto_approval() {
-    echo "[AUTO-APPROVE] Checking auto-approval configuration..."
-
-    # Check if COPILOT_ALLOW_ALL is set
-    if [ -z "${COPILOT_ALLOW_ALL+x}" ]; then
-        echo "[AUTO-APPROVE] COPILOT_ALLOW_ALL not set, auto-approval disabled (default behavior)"
-        return 0
-    fi
-
-    # Normalize value to lowercase
-    local value=$(echo "$COPILOT_ALLOW_ALL" | tr '[:upper:]' '[:lower:]')
-
-    case "$value" in
-        true|1|yes|on)
-            echo "[AUTO-APPROVE] Configuring auto-approval for all operations..."
-            # Ensure COPILOT_ALLOW_ALL enables all tools without confirmation
-            export COPILOT_ALLOW_ALL=true
-            # Persist to user's environment file for docker exec sessions
-            echo "export COPILOT_ALLOW_ALL=true" > /home/node/.copilot_env
-            # Source it from .bashrc for interactive shells
-            if [ ! -f /home/node/.bashrc ] || ! grep -q ".copilot_env" /home/node/.bashrc; then
-                echo "[ -f ~/.copilot_env ] && source ~/.copilot_env" >> /home/node/.bashrc
-            fi
-            echo "[AUTO-APPROVE] Auto-approval enabled successfully"
-            echo "[AUTO-APPROVE] All tool operations will proceed without interactive prompts"
-            echo "[AUTO-APPROVE] Copilot CLI is now fully autonomous"
-            ;;
-        false|0|no|off)
-            echo "[AUTO-APPROVE] Auto-approval explicitly disabled"
-            # Remove auto-approval if it was previously set
-            rm -f /home/node/.copilot_env
-            ;;
-        *)
-            echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_ALLOW_ALL' for COPILOT_ALLOW_ALL"
-            echo "[AUTO-APPROVE] Valid values are: true, false, 1, 0, yes, no, on, off"
-            echo "[AUTO-APPROVE] Defaulting to disabled (safe behavior)"
-            ;;
-    esac
-}
-
 # Function to escape value for JSON and sed replacement
 escape_for_json_and_sed() {
     local input="$1"
@@ -119,9 +78,6 @@ process_env_vars() {
 
     echo "[ENV-EXPAND] Environment variable expansion completed successfully"
 }
-
-# Configure auto-approval for Copilot CLI operations
-configure_copilot_auto_approval
 
 # Process environment variables once at boot time
 process_env_vars "$CONFIG_FILE"
