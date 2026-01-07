@@ -1,26 +1,7 @@
 #!/bin/bash
 set -e
 
-# This script runs as root initially to fix permissions,
-# then switches to the node user for the actual command
-
 CONFIG_FILE="/home/node/.copilot/mcp-config.json"
-
-# Ensure /home/node/.copilot directory exists
-# When /home/node is volume-mounted, this creates the directory if missing
-# but doesn't interfere with existing mounted content
-echo "[INIT] Checking /home/node directory structure..."
-
-if [ ! -d /home/node/.copilot ]; then
-    echo "[INIT] Creating /home/node/.copilot directory"
-    mkdir -p /home/node/.copilot
-    chown node:node /home/node/.copilot
-else
-    echo "[INIT] /home/node/.copilot already exists"
-    ls -la /home/node/.copilot/ | head -5
-fi
-
-echo "[INIT] Directory setup complete"
 
 # Function to configure auto-approval for Copilot CLI operations
 configure_copilot_auto_approval() {
@@ -132,11 +113,11 @@ process_env_vars() {
     echo "[ENV-EXPAND] Environment variable expansion completed successfully"
 }
 
-# Process environment variables once at boot time
-process_env_vars "$CONFIG_FILE"
-
 # Configure auto-approval for Copilot CLI operations
 configure_copilot_auto_approval
+
+# Process environment variables once at boot time
+process_env_vars "$CONFIG_FILE"
 
 # Process environment variables or configuration files with jq at startup
 # For example, if there are JSON configuration files, we could validate or process them
@@ -168,5 +149,5 @@ if [ ! -z "$JSON_CONFIG" ]; then
   fi
 fi
 
-# Switch to node user and execute the container's command
-exec runuser -u node -- "$@"
+# Execute the container's command
+exec "$@"

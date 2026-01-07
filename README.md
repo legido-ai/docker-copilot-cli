@@ -114,6 +114,27 @@ When autonomous mode is enabled, you'll see these log messages at container star
 
 **Only enable this in trusted, controlled environments** where you understand and accept these implications. The container runs as non-root user `node` which provides some isolation.
 
+## 🔐 Authentication Persistence
+
+By default, authentication credentials are stored inside the container and will be lost when the container is removed. To persist authentication across container restarts:
+
+```bash
+docker run -it --rm \
+  -v copilot-data:/home/node/.copilot \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ./workspace:/workspace \
+  -e COPILOT_AUTO_APPROVE=true \
+  ghcr.io/legido-ai-workspace/copilot-cli:latest
+```
+
+This mounts a Docker volume to `/home/node/.copilot` which stores:
+- Authentication tokens
+- User preferences  
+- Session history
+- Package cache
+
+**📖 For detailed authentication setup and troubleshooting, see [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md)**
+
 ## 📝 Copilot Instructions
 
 Custom Copilot instructions can be added to enhance the AI's behavior, for more information, see the [official documentation](https://copilot-instructions.md).
