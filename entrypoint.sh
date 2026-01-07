@@ -7,29 +7,30 @@ CONFIG_FILE="/home/node/.copilot/mcp-config.json"
 configure_copilot_auto_approval() {
     echo "[AUTO-APPROVE] Checking auto-approval configuration..."
 
-    # Check if COPILOT_AUTO_APPROVE_GIT_CLONE is set
-    if [ -z "${COPILOT_AUTO_APPROVE_GIT_CLONE+x}" ]; then
-        echo "[AUTO-APPROVE] COPILOT_AUTO_APPROVE_GIT_CLONE not set, auto-approval disabled (default behavior)"
+    # Check if COPILOT_AUTO_APPROVE is set
+    if [ -z "${COPILOT_AUTO_APPROVE+x}" ]; then
+        echo "[AUTO-APPROVE] COPILOT_AUTO_APPROVE not set, auto-approval disabled (default behavior)"
         return 0
     fi
 
     # Normalize value to lowercase
-    local value=$(echo "$COPILOT_AUTO_APPROVE_GIT_CLONE" | tr '[:upper:]' '[:lower:]')
+    local value=$(echo "$COPILOT_AUTO_APPROVE" | tr '[:upper:]' '[:lower:]')
 
     case "$value" in
         true|1|yes|on)
-            echo "[AUTO-APPROVE] Configuring git clone auto-approval..."
+            echo "[AUTO-APPROVE] Configuring auto-approval for all operations..."
             # Set COPILOT_ALLOW_ALL which enables all tools without confirmation
             # This is the native Copilot CLI environment variable for this purpose
             export COPILOT_ALLOW_ALL=true
-            echo "[AUTO-APPROVE] Git clone auto-approval enabled successfully"
+            echo "[AUTO-APPROVE] Auto-approval enabled successfully"
             echo "[AUTO-APPROVE] All tool operations will proceed without interactive prompts"
+            echo "[AUTO-APPROVE] Copilot CLI is now fully autonomous"
             ;;
         false|0|no|off)
             echo "[AUTO-APPROVE] Auto-approval explicitly disabled"
             ;;
         *)
-            echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE_GIT_CLONE' for COPILOT_AUTO_APPROVE_GIT_CLONE"
+            echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE' for COPILOT_AUTO_APPROVE"
             echo "[AUTO-APPROVE] Valid values are: true, false, 1, 0, yes, no, on, off"
             echo "[AUTO-APPROVE] Defaulting to disabled (safe behavior)"
             ;;

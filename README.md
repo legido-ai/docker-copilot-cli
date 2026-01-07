@@ -7,7 +7,7 @@ Professional Docker container for  [Copilot CLI](https://github.com/github/copil
 - **🔒 Security First**: Non-root user execution with minimal attack surface
 - **🔄 CI/CD Integration**: Automated builds and GitHub Actions support
 - **🐋 Docker-in-Docker**: Full containerization capabilities included
-- **⚡ Auto-Approval Mode**: Bypass interactive prompts for automated workflows
+- **🤖 Fully Autonomous Mode**: Run Copilot CLI without any interactive prompts
 
 ## 🚀 Quick Start
 
@@ -32,16 +32,27 @@ docker run -it --rm \
   ghcr.io/legido-ai-workspace/copilot-cli:latest
 ```
 
-## ⚙️ Auto-Approval Mode
+## 🤖 Fully Autonomous Mode
 
-For CI/CD pipelines, automated workflows, and non-interactive environments, you can enable auto-approval to bypass interactive confirmation prompts for `git clone` and other tool operations.
+For CI/CD pipelines, automated workflows, and non-interactive environments, enable autonomous mode to make Copilot CLI fully autonomous - **ALL operations proceed without any interactive prompts**.
+
+### What Gets Auto-Approved
+
+When `COPILOT_AUTO_APPROVE=true`, the following operations proceed automatically:
+- ✅ `git clone`, `git push`, `git pull` and all git operations
+- ✅ File creation, editing, and deletion
+- ✅ Shell command execution
+- ✅ Package installations (npm, pip, apt, etc.)
+- ✅ Docker operations
+- ✅ API calls and network operations
+- ✅ **ALL tool operations** - no exceptions
 
 ### Enable via Environment Variable
 
 ```bash
-# Using docker run
+# Using docker run - fully autonomous
 docker run -it --rm \
-  -e COPILOT_AUTO_APPROVE_GIT_CLONE=true \
+  -e COPILOT_AUTO_APPROVE=true \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ./config:/home/node \
   -v ./workspace:/workspace \
@@ -53,33 +64,34 @@ docker run -it --rm \
 Set the variable in your `.env` file:
 
 ```bash
-COPILOT_AUTO_APPROVE_GIT_CLONE=true
+COPILOT_AUTO_APPROVE=true
 ```
 
 Or directly in `docker-compose.yml`:
 
 ```yaml
 environment:
-  COPILOT_AUTO_APPROVE_GIT_CLONE: "true"
+  COPILOT_AUTO_APPROVE: "true"
 ```
 
 ### Configuration Options
 
 | Value | Behavior |
 |-------|----------|
-| `true`, `1`, `yes`, `on` | Auto-approval enabled - all tool operations proceed without prompts |
-| `false`, `0`, `no`, `off` | Auto-approval disabled - interactive prompts appear (default) |
+| `true`, `1`, `yes`, `on` | **Fully autonomous** - all operations proceed without any prompts |
+| `false`, `0`, `no`, `off` | Interactive mode - prompts for confirmations (default) |
 | Not set | Interactive mode (default behavior) |
 
 ### Startup Logs
 
-When auto-approval is configured, you'll see these log messages at container startup:
+When autonomous mode is enabled, you'll see these log messages at container startup:
 
 ```
 [AUTO-APPROVE] Checking auto-approval configuration...
-[AUTO-APPROVE] Configuring git clone auto-approval...
-[AUTO-APPROVE] Git clone auto-approval enabled successfully
+[AUTO-APPROVE] Configuring auto-approval for all operations...
+[AUTO-APPROVE] Auto-approval enabled successfully
 [AUTO-APPROVE] All tool operations will proceed without interactive prompts
+[AUTO-APPROVE] Copilot CLI is now fully autonomous
 ```
 
 ### Use Cases
@@ -88,10 +100,19 @@ When auto-approval is configured, you'll see these log messages at container sta
 - **Kubernetes Deployments**: Automated container orchestration without TTY
 - **Batch Operations**: Scripted workflows that execute multiple commands
 - **Unattended Containers**: Background processes that don't have user interaction
+- **Automated Code Reviews**: Let Copilot analyze and fix code autonomously
+- **Infrastructure Automation**: Automated deployments and system management
 
 ### Security Considerations
 
-⚠️ **Important**: Auto-approval mode grants permission for all tool operations without confirmation. Only enable this in trusted, controlled environments where you understand the implications.
+⚠️ **Important**: Autonomous mode grants permission for **ALL tool operations** without confirmation. This means Copilot CLI can:
+- Execute any shell command
+- Modify or delete any file in the workspace
+- Make network requests
+- Install packages
+- Push changes to git repositories
+
+**Only enable this in trusted, controlled environments** where you understand and accept these implications. The container runs as non-root user `node` which provides some isolation.
 
 ## 📝 Copilot Instructions
 
