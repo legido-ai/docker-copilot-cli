@@ -3,6 +3,39 @@ set -e
 
 CONFIG_FILE="/home/node/.copilot/mcp-config.json"
 
+# Function to configure auto-approval for Copilot CLI operations
+configure_copilot_auto_approval() {
+    echo "[AUTO-APPROVE] Checking auto-approval configuration..."
+
+    # Check if COPILOT_AUTO_APPROVE_GIT_CLONE is set
+    if [ -z "${COPILOT_AUTO_APPROVE_GIT_CLONE+x}" ]; then
+        echo "[AUTO-APPROVE] COPILOT_AUTO_APPROVE_GIT_CLONE not set, auto-approval disabled (default behavior)"
+        return 0
+    fi
+
+    # Normalize value to lowercase
+    local value=$(echo "$COPILOT_AUTO_APPROVE_GIT_CLONE" | tr '[:upper:]' '[:lower:]')
+
+    case "$value" in
+        true|1|yes|on)
+            echo "[AUTO-APPROVE] Configuring git clone auto-approval..."
+            # Set COPILOT_ALLOW_ALL which enables all tools without confirmation
+            # This is the native Copilot CLI environment variable for this purpose
+            export COPILOT_ALLOW_ALL=true
+            echo "[AUTO-APPROVE] Git clone auto-approval enabled successfully"
+            echo "[AUTO-APPROVE] All tool operations will proceed without interactive prompts"
+            ;;
+        false|0|no|off)
+            echo "[AUTO-APPROVE] Auto-approval explicitly disabled"
+            ;;
+        *)
+            echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE_GIT_CLONE' for COPILOT_AUTO_APPROVE_GIT_CLONE"
+            echo "[AUTO-APPROVE] Valid values are: true, false, 1, 0, yes, no, on, off"
+            echo "[AUTO-APPROVE] Defaulting to disabled (safe behavior)"
+            ;;
+    esac
+}
+
 # Function to escape value for JSON and sed replacement
 escape_for_json_and_sed() {
     local input="$1"
@@ -81,6 +114,9 @@ process_env_vars() {
 
 # Process environment variables once at boot time
 process_env_vars "$CONFIG_FILE"
+
+# Configure auto-approval for Copilot CLI operations
+configure_copilot_auto_approval
 
 # Process environment variables or configuration files with jq at startup
 # For example, if there are JSON configuration files, we could validate or process them
