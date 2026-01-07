@@ -47,7 +47,7 @@ docker run -it \
   -v copilot-data:/home/node/.copilot \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $(pwd):/workspace \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   legidoai/copilot-cli:latest
 ```
 
@@ -85,7 +85,7 @@ The auto-approval feature (introduced in PR #3) **still works correctly** after 
 ```bash
 docker run -it \
   -v copilot-data:/home/node/.copilot \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   legidoai/copilot-cli:latest
 ```
 

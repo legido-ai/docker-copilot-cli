@@ -4,37 +4,22 @@ This document explains the environment variables used by the Docker Copilot CLI 
 
 ## Auto-Approval Variables
 
-### `COPILOT_AUTO_APPROVE` (Recommended)
+### `COPILOT_ALLOW_ALL` (Recommended)
 
-**User-facing variable for enabling auto-approval mode.**
+**Official GitHub Copilot CLI environment variable to enable auto-approval.**
 
-- **Purpose**: Easy-to-understand variable for enabling fully autonomous Copilot CLI operation
-- **Set by**: User (in docker-compose.yml or docker run)
-- **Values**: 
-  - `true`, `1`, `yes`, `on` - Enable auto-approval
-  - `false`, `0`, `no`, `off` - Disable auto-approval  
-  - Not set - Default (disabled)
+- **Purpose**: Enable fully autonomous Copilot CLI operation (no interactive prompts)
+- **Set by**: User (in docker-compose.yml or with docker run -e) or CI environments
+- **Values**:
+  - `true`, `1`, `yes`, `on` — Enable auto-approval
+  - `false`, `0`, `no`, `off` — Disable auto-approval
+  - Not set — Disabled (default)
 - **Usage**:
   ```bash
-  docker run -e COPILOT_AUTO_APPROVE=true legidoai/copilot-cli
+  docker run -e COPILOT_ALLOW_ALL=true legidoai/copilot-cli
   ```
 
-### `COPILOT_ALLOW_ALL` (Internal)
-
-**Official GitHub Copilot CLI variable that actually controls auto-approval.**
-
-- **Purpose**: Native Copilot CLI environment variable (corresponds to `--allow-all-tools` flag)
-- **Set by**: Entrypoint script (automatically when `COPILOT_AUTO_APPROVE=true`)
-- **Values**: `true` or unset
-- **Note**: Users should set `COPILOT_AUTO_APPROVE` instead of this variable directly
-
-## Why Two Variables?
-
-The container uses a wrapper pattern for better user experience:
-
-1. **User sets** `COPILOT_AUTO_APPROVE=true` (clear, descriptive name)
-2. **Entrypoint translates** to `COPILOT_ALLOW_ALL=true` (GitHub's official variable)
-3. **Copilot CLI reads** `COPILOT_ALLOW_ALL` and enables auto-approval
+Note: Set COPILOT_ALLOW_ALL directly; there is no separate wrapper variable.
 
 This abstraction provides:
 - ✅ More intuitive variable name for users
@@ -43,7 +28,7 @@ This abstraction provides:
 
 ## How Auto-Approval Persists
 
-When `COPILOT_AUTO_APPROVE=true`, the entrypoint script:
+When `COPILOT_ALLOW_ALL=true`, the entrypoint script:
 
 1. Exports `COPILOT_ALLOW_ALL=true` for the current process
 2. Writes `export COPILOT_ALLOW_ALL=true` to `/home/node/.copilot_env`
@@ -152,7 +137,7 @@ services:
     tty: true
     environment:
       # Auto-approval (fully autonomous mode)
-      COPILOT_AUTO_APPROVE: "true"
+      COPILOT_ALLOW_ALL: "true"
       
       # Copilot CLI settings
       COPILOT_MODEL: "gpt-5-mini"
@@ -191,7 +176,7 @@ volumes:
 1. **Never commit secrets** to git repositories
 2. **Use `.env` files** for local development (add to `.gitignore`)
 3. **Use secret managers** in production (AWS Secrets Manager, GitHub Secrets, etc.)
-4. **Limit `COPILOT_AUTO_APPROVE=true`** to trusted, controlled environments
+4. **Limit `COPILOT_ALLOW_ALL=true`** to trusted, controlled environments
 5. **Rotate credentials regularly**, especially GitHub tokens
 6. **Use volume mounts** (not bind mounts) for `/home/node/.copilot` for better security
 
@@ -199,7 +184,7 @@ volumes:
 
 ### Auto-approval not working
 
-**Symptom**: Still getting interactive prompts despite `COPILOT_AUTO_APPROVE=true`
+**Symptom**: Still getting interactive prompts despite `COPILOT_ALLOW_ALL=true`
 
 **Solutions**:
 1. Verify the variable is set:

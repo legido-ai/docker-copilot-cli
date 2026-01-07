@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Comprehensive authentication persistence documentation in docs/AUTHENTICATION.md
 - Auto-approval environment variable now persists across docker exec sessions via ~/.copilot_env
-- Documentation clarifying COPILOT_AUTO_APPROVE vs COPILOT_ALLOW_ALL usage
+- Removed COPILOT_AUTO_APPROVE wrapper; users should set COPILOT_ALLOW_ALL directly to enable auto-approval
 
 ### Changed
 - Reverted Dockerfile to run as node user (USER node) instead of root with runuser
@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dockerfile with Node.js base and GitHub Copilot CLI
 - Docker-in-Docker support via docker.sock mount
 - Entrypoint script with environment variable processing
-- Auto-approval feature via COPILOT_AUTO_APPROVE environment variable
+- Auto-approval feature via COPILOT_ALLOW_ALL environment variable
 - MCP config environment variable expansion
 - Docker Compose configuration with health checks
 

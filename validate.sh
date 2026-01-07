@@ -27,7 +27,7 @@ echo ""
 echo "Step 4: Starting container with auto-approve..."
 docker run --name test \
   -v /tmp/home_node:/home/node \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   -d localhost/test > /dev/null
 echo "✓ Container started"
 echo ""

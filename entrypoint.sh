@@ -7,20 +7,19 @@ CONFIG_FILE="/home/node/.copilot/mcp-config.json"
 configure_copilot_auto_approval() {
     echo "[AUTO-APPROVE] Checking auto-approval configuration..."
 
-    # Check if COPILOT_AUTO_APPROVE is set
-    if [ -z "${COPILOT_AUTO_APPROVE+x}" ]; then
-        echo "[AUTO-APPROVE] COPILOT_AUTO_APPROVE not set, auto-approval disabled (default behavior)"
+    # Check if COPILOT_ALLOW_ALL is set
+    if [ -z "${COPILOT_ALLOW_ALL+x}" ]; then
+        echo "[AUTO-APPROVE] COPILOT_ALLOW_ALL not set, auto-approval disabled (default behavior)"
         return 0
     fi
 
     # Normalize value to lowercase
-    local value=$(echo "$COPILOT_AUTO_APPROVE" | tr '[:upper:]' '[:lower:]')
+    local value=$(echo "$COPILOT_ALLOW_ALL" | tr '[:upper:]' '[:lower:]')
 
     case "$value" in
         true|1|yes|on)
             echo "[AUTO-APPROVE] Configuring auto-approval for all operations..."
-            # Set COPILOT_ALLOW_ALL which enables all tools without confirmation
-            # This is the native Copilot CLI environment variable for this purpose
+            # Ensure COPILOT_ALLOW_ALL enables all tools without confirmation
             export COPILOT_ALLOW_ALL=true
             # Persist to user's environment file for docker exec sessions
             echo "export COPILOT_ALLOW_ALL=true" > /home/node/.copilot_env
@@ -38,7 +37,7 @@ configure_copilot_auto_approval() {
             rm -f /home/node/.copilot_env
             ;;
         *)
-            echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE' for COPILOT_AUTO_APPROVE"
+            echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_ALLOW_ALL' for COPILOT_ALLOW_ALL"
             echo "[AUTO-APPROVE] Valid values are: true, false, 1, 0, yes, no, on, off"
             echo "[AUTO-APPROVE] Defaulting to disabled (safe behavior)"
             ;;

@@ -20,7 +20,7 @@ docker run -it \
   -v copilot-data:/home/node/.copilot \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $(pwd):/workspace \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   legidoai/copilot-cli:latest
 ```
 
@@ -37,7 +37,7 @@ docker run -it \
   -v copilot-config:/home/node/.copilot/config.json \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $(pwd):/workspace \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   legidoai/copilot-cli:latest
 ```
 
@@ -52,7 +52,7 @@ docker run -it \
   -v ~/.copilot-docker:/home/node/.copilot \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $(pwd):/workspace \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   legidoai/copilot-cli:latest
 ```
 
@@ -60,14 +60,14 @@ This stores authentication data on your host machine at `~/.copilot-docker`.
 
 ## Using with Auto-Approval
 
-The `COPILOT_AUTO_APPROVE` environment variable enables fully autonomous mode. Combine it with authentication persistence:
+The `COPILOT_ALLOW_ALL` environment variable enables fully autonomous mode. Combine it with authentication persistence:
 
 ```bash
 docker run -it \
   -v copilot-data:/home/node/.copilot \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $(pwd):/workspace \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   legidoai/copilot-cli:latest
 ```
 
@@ -92,7 +92,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./workspace:/workspace
     environment:
-      - COPILOT_AUTO_APPROVE=true
+      - COPILOT_ALLOW_ALL=true
     working_dir: /workspace
 
 volumes:
@@ -157,7 +157,7 @@ chown -R 1000:1000 ~/.copilot-docker
 1. **Token Storage**: Authentication tokens are stored in plain text in `config.json`. Protect this file.
 2. **Volume Permissions**: Use Docker named volumes (not bind mounts) for better security.
 3. **Token Rotation**: GitHub tokens may expire; be prepared to re-authenticate.
-4. **Auto-Approval**: Only use `COPILOT_AUTO_APPROVE=true` in trusted environments.
+4. **Auto-Approval**: Only use `COPILOT_ALLOW_ALL=true` in trusted environments.
 
 ## Config File Format
 

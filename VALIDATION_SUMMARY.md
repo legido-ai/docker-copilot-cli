@@ -54,7 +54,7 @@ docker build -t localhost/test .
 
 # 2. Run container
 docker stop test 2>/dev/null || true && docker rm test 2>/dev/null || true
-docker run --name test -v /tmp/home_node:/home/node -e COPILOT_AUTO_APPROVE=true -d localhost/test
+docker run --name test -v /tmp/home_node:/home/node -e COPILOT_ALLOW_ALL=true -d localhost/test
 
 # 3. Setup (Docker-in-Docker workaround)
 docker cp /tmp/home_node/.copilot test:/home/node/

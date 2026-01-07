@@ -38,7 +38,7 @@ For CI/CD pipelines, automated workflows, and non-interactive environments, enab
 
 ### What Gets Auto-Approved
 
-When `COPILOT_AUTO_APPROVE=true`, the following operations proceed automatically:
+When `COPILOT_ALLOW_ALL=true`, the following operations proceed automatically:
 - ✅ `git clone`, `git push`, `git pull` and all git operations
 - ✅ File creation, editing, and deletion
 - ✅ Shell command execution
@@ -52,7 +52,7 @@ When `COPILOT_AUTO_APPROVE=true`, the following operations proceed automatically
 ```bash
 # Using docker run - fully autonomous
 docker run -it --rm \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ./config:/home/node \
   -v ./workspace:/workspace \
@@ -64,14 +64,14 @@ docker run -it --rm \
 Set the variable in your `.env` file:
 
 ```bash
-COPILOT_AUTO_APPROVE=true
+COPILOT_ALLOW_ALL=true
 ```
 
 Or directly in `docker-compose.yml`:
 
 ```yaml
 environment:
-  COPILOT_AUTO_APPROVE: "true"
+  COPILOT_ALLOW_ALL: "true"
 ```
 
 ### Configuration Options
@@ -82,7 +82,7 @@ environment:
 | `false`, `0`, `no`, `off` | Interactive mode - prompts for confirmations (default) |
 | Not set | Interactive mode (default behavior) |
 
-**Note**: `COPILOT_AUTO_APPROVE` is our user-friendly wrapper that internally sets GitHub's official `COPILOT_ALLOW_ALL` variable. See [docs/ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) for details on all environment variables.
+**Note**: Set COPILOT_ALLOW_ALL (official Copilot CLI environment variable) to enable auto-approval. See [docs/ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) for details on all environment variables.
 
 ### Startup Logs
 
@@ -125,7 +125,7 @@ docker run -it --rm \
   -v copilot-data:/home/node/.copilot \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v ./workspace:/workspace \
-  -e COPILOT_AUTO_APPROVE=true \
+  -e COPILOT_ALLOW_ALL=true \
   ghcr.io/legido-ai-workspace/copilot-cli:latest
 ```
 
