@@ -22,12 +22,20 @@ configure_copilot_auto_approval() {
             # Set COPILOT_ALLOW_ALL which enables all tools without confirmation
             # This is the native Copilot CLI environment variable for this purpose
             export COPILOT_ALLOW_ALL=true
+            # Persist to user's environment file for docker exec sessions
+            echo "export COPILOT_ALLOW_ALL=true" > /home/node/.copilot_env
+            # Source it from .bashrc for interactive shells
+            if [ ! -f /home/node/.bashrc ] || ! grep -q ".copilot_env" /home/node/.bashrc; then
+                echo "[ -f ~/.copilot_env ] && source ~/.copilot_env" >> /home/node/.bashrc
+            fi
             echo "[AUTO-APPROVE] Auto-approval enabled successfully"
             echo "[AUTO-APPROVE] All tool operations will proceed without interactive prompts"
             echo "[AUTO-APPROVE] Copilot CLI is now fully autonomous"
             ;;
         false|0|no|off)
             echo "[AUTO-APPROVE] Auto-approval explicitly disabled"
+            # Remove auto-approval if it was previously set
+            rm -f /home/node/.copilot_env
             ;;
         *)
             echo "[AUTO-APPROVE] Warning: Invalid value '$COPILOT_AUTO_APPROVE' for COPILOT_AUTO_APPROVE"

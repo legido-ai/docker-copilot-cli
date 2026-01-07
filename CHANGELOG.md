@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Authentication persistence bug caused by running container as root instead of node user
+- Auto-approval not working in `docker exec` sessions due to environment variable not persisting
+- Container now runs as node user from startup, ensuring proper /home/node volume mount behavior
+
+### Added
+- Comprehensive authentication persistence documentation in docs/AUTHENTICATION.md
+- Auto-approval environment variable now persists across docker exec sessions via ~/.copilot_env
+- Documentation clarifying COPILOT_AUTO_APPROVE vs COPILOT_ALLOW_ALL usage
+
+### Changed
+- Reverted Dockerfile to run as node user (USER node) instead of root with runuser
+- Auto-approval configuration now persists to /home/node/.copilot_env and ~/.bashrc
+- Improved entrypoint logging for auto-approval status
+
 ## [0.1.0] - 2026-01-07
 
 ### Added

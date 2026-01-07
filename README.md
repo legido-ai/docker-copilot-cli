@@ -82,6 +82,8 @@ environment:
 | `false`, `0`, `no`, `off` | Interactive mode - prompts for confirmations (default) |
 | Not set | Interactive mode (default behavior) |
 
+**Note**: `COPILOT_AUTO_APPROVE` is our user-friendly wrapper that internally sets GitHub's official `COPILOT_ALLOW_ALL` variable. See [docs/ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) for details on all environment variables.
+
 ### Startup Logs
 
 When autonomous mode is enabled, you'll see these log messages at container startup:
