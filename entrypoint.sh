@@ -6,12 +6,21 @@ set -e
 
 CONFIG_FILE="/home/node/.copilot/mcp-config.json"
 
-# Ensure .copilot directory exists and is owned by node user
-# This handles the case where /home/node is mounted from the host
+# Ensure /home/node/.copilot directory exists
+# When /home/node is volume-mounted, this creates the directory if missing
+# but doesn't interfere with existing mounted content
+echo "[INIT] Checking /home/node directory structure..."
+
 if [ ! -d /home/node/.copilot ]; then
+    echo "[INIT] Creating /home/node/.copilot directory"
     mkdir -p /home/node/.copilot
+    chown node:node /home/node/.copilot
+else
+    echo "[INIT] /home/node/.copilot already exists"
+    ls -la /home/node/.copilot/ | head -5
 fi
-chown -R node:node /home/node/.copilot 2>/dev/null || true
+
+echo "[INIT] Directory setup complete"
 
 # Function to configure auto-approval for Copilot CLI operations
 configure_copilot_auto_approval() {
