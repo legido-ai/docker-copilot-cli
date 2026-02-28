@@ -24,7 +24,8 @@ RUN npm install -g @github/copilot
 
 # Set up runtime directories
 RUN mkdir -p /workspace \
-    && chown -R node:node /workspace
+    && chown -R node:node /workspace \
+    && ln -sf /dind/docker.sock /var/run/docker.sock
 
 USER node
 

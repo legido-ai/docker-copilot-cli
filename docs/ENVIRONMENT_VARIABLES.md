@@ -82,6 +82,18 @@ docker run -e XDG_CONFIG_HOME=/custom/config legidoai/copilot-cli
 
 These are specific to our Docker container configuration:
 
+### `DIND_DOCKER_GID`
+
+Docker group GID exposed by the `docker:dind` sidecar socket.
+
+- **Purpose**: Grants `copilot-cli` access to the DinD Unix socket via `group_add`
+- **Default**: `2375` (default `docker` group in `docker:dind`)
+- **Set in**: `.env` / shell env used by `docker compose`
+- **Usage**:
+  ```bash
+  DIND_DOCKER_GID=2375
+  ```
+
 ### AWS Credentials
 
 For AWS operations via Docker-based AWS CLI:
