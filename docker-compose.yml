@@ -1,19 +1,40 @@
 services:
+
+  dind:
+    container_name: dind
+    environment:
+      DOCKER_TLS_CERTDIR: "" # Disables TLS for internal communication
+    image: docker:dind
+    networks:
+      - copilot-net
+    privileged: true
+    volumes:
+      # Persists images and build cache to speed up operations
+      - dind-storage:/var/lib/docker
+      # Shared workspace so DinD can mount files into child containers
+      - ${VOLUME_WORKSPACE:-./workspace}:/workspace
+
   copilot-cli:
     build:
-      args:
-        # Output of command: getent group docker | cut -d: -f3
-        DOCKER_GID: ${DOCKER_GID:-998}
       context: .
+      args:
+        DOCKER_GID: ${DOCKER_GID:-998}
     container_name: ${CONTAINER_NAME:-copilot-cli}
+    depends_on:
+      - dind
     environment:
+      # Point the CLI to the sidecar instead of the host socket
+      DOCKER_HOST: tcp://dind:2375
+      # AWS Credentials
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      # GitHub & App Config
       COPILOT_ALLOW_ALL: ${COPILOT_ALLOW_ALL:-false}
       GITHUB_APP_ID: ${GITHUB_APP_ID}
       GITHUB_INSTALLATION_ID: ${GITHUB_INSTALLATION_ID}
       GITHUB_PRIVATE_KEY: ${GITHUB_PRIVATE_KEY}
+      # Monitoring & SSH
       PHOENIX_API_KEY: ${PHOENIX_API_KEY}
       PHOENIX_ENDPOINT: ${PHOENIX_ENDPOINT}
       SSH_PRIVATE_KEY: ${SSH_PRIVATE_KEY}
@@ -27,4 +48,13 @@ services:
     volumes:
       - ${VOLUME_WORKSPACE:-./workspace}:/workspace
       - ${VOLUME_CONFIG:-./config}:/home/node
-      - /var/run/docker.sock:/var/run/docker.sock
+      # Note: /var/run/docker.sock is NOT mounted here to ensure host isolation
+    networks:
+      - copilot-net
+
+volumes:
+  dind-storage:
+
+networks:
+  copilot-net:
+    driver: bridge
