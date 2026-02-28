@@ -1,7 +1,7 @@
 services:
 
   dind:
-    container_name: dind
+    container_name: ${CONTAINER_NAME_DIND:-dind-copilot-cli}
     environment:
       DOCKER_TLS_CERTDIR: "" # Disables TLS for internal communication
     image: docker:dind
