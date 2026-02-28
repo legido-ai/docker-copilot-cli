@@ -7,20 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING**: Migrated from host Docker socket mounting to full Docker-in-Docker (DinD) architecture
+  - Old single-container approach with `-v /var/run/docker.sock` is no longer supported
+  - Now uses separate DinD container for complete container isolation
+  - Requires Docker Compose setup with two services: `dind` and `copilot-cli`
+  - All Docker operations now isolated from host system
+- Updated README with new Docker Compose setup instructions
+- Updated one-command setup to use `docker-compose up -d`
+
+### Added
+- Docker-in-Docker (DinD) support via separate `dind` service in docker-compose.yml
+- Docker socket sharing between DinD and Copilot CLI via Unix socket volume
+- Health checks for both DinD and Copilot CLI services
+- Comprehensive Docker-in-Docker architecture documentation
+
 ### Fixed
 - Authentication persistence bug caused by running container as root instead of node user
 - Auto-approval not working in `docker exec` sessions due to environment variable not persisting
 - Container now runs as node user from startup, ensuring proper /home/node volume mount behavior
 
-### Added
-- Comprehensive authentication persistence documentation in docs/AUTHENTICATION.md
-- Auto-approval environment variable now persists across docker exec sessions via ~/.copilot_env
-- Removed COPILOT_AUTO_APPROVE wrapper; users should set COPILOT_ALLOW_ALL directly to enable auto-approval
-
-### Changed
-- Reverted Dockerfile to run as node user (USER node) instead of root with runuser
-- Auto-approval configuration now persists to /home/node/.copilot_env and ~/.bashrc
-- Improved entrypoint logging for auto-approval status
+### Deprecated
+- Direct host Docker socket mounting (old approach with `-v /var/run/docker.sock`)
+- Single-container setup without DinD support
 
 ## [0.1.0] - 2026-01-07
 

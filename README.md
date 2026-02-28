@@ -20,15 +20,49 @@ Professional Docker container for  [Copilot CLI](https://github.com/github/copil
 | 🔑 **GitHub Access** | App/PAT | Repository operations |
 | 💾 **Free Disk Space** | 2GB+ | Image and container storage |
 
-### ⚡ One-Command Setup
+### ⚡ One-Command Setup with Docker Compose
+
+This container uses **Docker-in-Docker (DinD)** for complete container isolation. To start:
 
 ```bash
-# Pull and run the latest image
+# Clone and setup the repository
+git clone https://github.com/legido-ai/docker-copilot-cli.git
+cd docker-copilot-cli
+
+# Create environment configuration (optional)
+cp .env.example .env
+
+# Start the services (DinD + Copilot CLI)
+docker-compose up -d
+
+# Access the Copilot CLI container
+docker-compose exec copilot-cli bash
+```
+
+### Docker Run Alternative
+
+For standalone Docker runs without Docker Compose, use Docker-in-Docker with a separate DinD container:
+
+```bash
+# Start the DinD service first
+docker run -d \
+  --name dind-copilot \
+  --privileged \
+  -v dind-socket:/dind \
+  -v dind-storage:/var/lib/docker \
+  docker:dind --host=unix:///dind/docker.sock
+
+# Wait for DinD to be healthy (about 10 seconds)
+sleep 10
+
+# Run the Copilot CLI container connected to DinD
 docker run -it --rm \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v ./config/home/node \
-  -v ./workspace/workspace \
-  --name copilot-cli \
+  --volumes-from dind-copilot:ro \
+  -v ./workspace:/workspace \
+  -v ./config:/home/node \
+  -v dind-socket:/dind \
+  -e DOCKER_HOST=unix:///dind/docker.sock \
+  --link dind-copilot \
   ghcr.io/legido-ai-workspace/copilot-cli:latest
 ```
 
